@@ -1,0 +1,10 @@
+{
+  "status": 0,
+  "image_url": "https://whysoseriusbro.github.io/meu-clima/image.bmp",
+  "filename": "image.bmp",
+  "refresh_rate": 3600,
+  "reset_firmware": false,
+  "update_firmware": false,
+  "firmware_url": null,
+  "special_function": "sleep"
+}
