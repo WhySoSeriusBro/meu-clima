@@ -1,0 +1,61 @@
+name: TRMNL Serverless Hack
+
+on:
+  schedule:
+    - cron: '5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar Puppeteer
+        run: npm install puppeteer
+
+      - name: Gerar HTML e Screenshot (PNG)
+        run: node build.mjs
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Instalar Pillow e Converter para BMP
+        run: |
+          pip install Pillow
+          python -c "from PIL import Image; Image.open('screen.png').convert('1').save('image.bmp')"
+
+      - name: Gerar API JSON
+        run: |
+          mkdir -p api
+          cat << 'EOF' > api/display
+          {
+            "status": 0,
+            "image_url": "https://whysoseriusbro.github.io/meu-clima/image.bmp",
+            "filename": "image.bmp",
+            "refresh_rate": 3600,
+            "reset_firmware": false,
+            "update_firmware": false,
+            "firmware_url": null,
+            "special_function": "sleep"
+          }
+          EOF
+
+      - name: Fazer Commit e Push
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add index.html screen.png image.bmp api/display
+          git commit -m "chore: atualiza imagem TRMNL" || echo "Sem mudanças para commitar"
+          git push
