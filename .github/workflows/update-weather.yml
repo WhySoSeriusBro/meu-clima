@@ -1,0 +1,33 @@
+name: Update Weather TRMNL
+
+on:
+  schedule:
+    # Corre a cada hora aos 5 minutos para garantir que os dados estão atualizados
+    - cron: '5 * * * *'
+  workflow_dispatch: # Permite correr manualmente no GitHub
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Gerar novo index.html
+        run: node build.mjs
+
+      - name: Fazer Commit e Push
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m "chore: atualiza meteo" || echo "Sem mudanças para commitar"
+          git push
