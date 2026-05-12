@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path';
 
 const CONFIG = {
   lat: 38.679,
@@ -34,14 +35,11 @@ async function build() {
     const res = await fetch(url);
     const data = await res.json();
     
-    // Obter data/hora atual no fuso horário local especificado
     const nowStr = new Date().toLocaleString("en-US", { timeZone: CONFIG.timezone });
     const now = new Date(nowStr);
-    
     const topDate = now.toLocaleDateString("pt-PT", { weekday: "long", day: "numeric", month: "2-digit" }).toUpperCase();
     
     const times = data.hourly.time;
-    // Format atual hour to match open-meteo format (YYYY-MM-DDTHH:00)
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
@@ -77,7 +75,6 @@ async function build() {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=800">
-<title>Meteorologia Minimalista TRMNL</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -143,9 +140,28 @@ async function build() {
 </html>`;
 
     fs.writeFileSync('index.html', html);
-    console.log("✅ index.html gerado com sucesso com os dados atualizados!");
+    console.log("✅ index.html gerado com sucesso!");
+
+    // Tentar correr puppeteer se estiver instalado
+    try {
+      const puppeteer = (await import('puppeteer')).default;
+      console.log("A iniciar puppeteer para tirar print screen...");
+      const browser = await puppeteer.launch({ 
+        headless: "new",
+        args: ['--no-sandbox', '--disable-setuid-sandbox'] 
+      });
+      const page = await browser.newPage();
+      await page.setViewport({ width: 800, height: 480, deviceScaleFactor: 1 });
+      const filePath = `file://${path.resolve('index.html')}`;
+      await page.goto(filePath, { waitUntil: 'networkidle0' });
+      await page.screenshot({ path: 'screen.png', clip: { x: 0, y: 0, width: 800, height: 480 } });
+      await browser.close();
+      console.log("✅ screen.png gerado com sucesso!");
+    } catch (e) {
+      console.log("Puppeteer não encontrado ou erro, ignorando screenshot. Erro:", e.message);
+    }
   } catch (err) {
-    console.error("❌ Erro ao gerar o HTML:", err);
+    console.error("❌ Erro ao gerar os ficheiros:", err);
     process.exit(1);
   }
 }

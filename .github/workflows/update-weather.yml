@@ -1,10 +1,10 @@
-name: Update Weather TRMNL
+name: TRMNL Serverless Hack
 
 on:
   schedule:
-    # Corre a cada hora aos 5 minutos para garantir que os dados estão atualizados
+    # Atualiza de hora a hora
     - cron: '5 * * * *'
-  workflow_dispatch: # Permite correr manualmente no GitHub
+  workflow_dispatch: # Permite correr manualmente
 
 jobs:
   build:
@@ -21,13 +21,35 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Gerar novo index.html
+      - name: Instalar Puppeteer
+        run: npm install puppeteer
+
+      - name: Gerar HTML e Screenshot (PNG)
         run: node build.mjs
+
+      - name: Converter para BMP (Preto e Branco)
+        run: convert screen.png -monochrome -colors 2 -alpha off -depth 1 -strip bmp:image.bmp
+
+      - name: Gerar API JSON
+        run: |
+          mkdir -p api
+          cat << 'EOF' > api/display
+          {
+            "status": 0,
+            "image_url": "https://whysoseriusbro.github.io/meu-clima/image.bmp",
+            "filename": "image.bmp",
+            "refresh_rate": 3600,
+            "reset_firmware": false,
+            "update_firmware": false,
+            "firmware_url": null,
+            "special_function": "sleep"
+          }
+          EOF
 
       - name: Fazer Commit e Push
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add index.html
-          git commit -m "chore: atualiza meteo" || echo "Sem mudanças para commitar"
+          git add index.html screen.png image.bmp api/display
+          git commit -m "chore: atualiza imagem TRMNL" || echo "Sem mudanças para commitar"
           git push
