@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       contents: write
 
@@ -20,11 +20,8 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Instalar Puppeteer e ImageMagick
-        run: |
-          npm install puppeteer
-          sudo apt-get update
-          sudo apt-get install -y imagemagick
+      - name: Instalar Puppeteer
+        run: npm install puppeteer
 
       - name: Gerar HTML e Screenshot (PNG)
         run: node build.mjs
