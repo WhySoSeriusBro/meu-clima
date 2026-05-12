@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     permissions:
       contents: write
 
@@ -26,8 +26,15 @@ jobs:
       - name: Gerar HTML e Screenshot (PNG)
         run: node build.mjs
 
-      - name: Converter para BMP (Preto e Branco)
-        run: convert screen.png -monochrome -colors 2 -alpha off -depth 1 -strip bmp:image.bmp
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Instalar Pillow e Converter para BMP
+        run: |
+          pip install Pillow
+          python -c "from PIL import Image; Image.open('screen.png').convert('1').save('image.bmp')"
 
       - name: Gerar API JSON
         run: |
