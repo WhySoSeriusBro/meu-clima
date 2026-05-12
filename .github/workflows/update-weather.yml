@@ -2,9 +2,8 @@ name: TRMNL Serverless Hack
 
 on:
   schedule:
-    # Atualiza de hora a hora
     - cron: '5 * * * *'
-  workflow_dispatch: # Permite correr manualmente
+  workflow_dispatch:
 
 jobs:
   build:
@@ -21,8 +20,11 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Instalar Puppeteer
-        run: npm install puppeteer
+      - name: Instalar Puppeteer e ImageMagick
+        run: |
+          npm install puppeteer
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
 
       - name: Gerar HTML e Screenshot (PNG)
         run: node build.mjs
