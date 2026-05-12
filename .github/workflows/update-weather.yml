@@ -39,6 +39,8 @@ jobs:
       - name: Gerar API JSON
         run: |
           mkdir -p api
+          
+          # 1. API de Display
           cat << 'EOF' > api/display
           {
             "status": 0,
@@ -51,11 +53,21 @@ jobs:
             "special_function": "sleep"
           }
           EOF
+          
+          # 2. API de Registo (Setup) - MUITO IMPORTANTE para o primeiro arranque!
+          cat << 'EOF' > api/setup
+          {
+            "api_key": "12345678-1234-1234-1234-123456789012",
+            "friendly_id": "MEU-CLIMA",
+            "image_url": "https://whysoseriusbro.github.io/meu-clima/image.bmp",
+            "message": "Welcome!"
+          }
+          EOF
 
       - name: Fazer Commit e Push
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add index.html screen.png image.bmp api/display
+          git add index.html screen.png image.bmp api/display api/setup
           git commit -m "chore: atualiza imagem TRMNL" || echo "Sem mudanças para commitar"
           git push
