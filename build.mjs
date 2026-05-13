@@ -35,23 +35,32 @@ async function build() {
     const res = await fetch(url);
     const data = await res.json();
     
-    const nowStr = new Date().toLocaleString("en-US", { timeZone: CONFIG.timezone });
-    const now = new Date(nowStr);
-    const topDate = now.toLocaleDateString("pt-PT", { weekday: "long", day: "numeric", month: "2-digit" }).toUpperCase();
-    
-    const times = data.hourly.time;
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hour = String(now.getHours()).padStart(2, '0');
+    const now = new Date();
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: CONFIG.timezone,
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', hour12: false
+    }).formatToParts(now);
+    const get = (type) => parts.find(p => p.type === type).value;
+    const year = get('year');
+    const month = get('month');
+    const day = get('day');
+    const hour = get('hour') === '24' ? '00' : get('hour');
+    const minute = get('minute');
     const nowHour = `${year}-${month}-${day}T${hour}:00`;
-    
+    const exactTime = `${hour}:${minute}`;
+    const topDate = now.toLocaleDateString("pt-PT", {
+      weekday: "long", day: "numeric", month: "2-digit", timeZone: CONFIG.timezone
+    }).toUpperCase();
+
+    const times = data.hourly.time;
+
     let idx = times.findIndex(t => t.startsWith(nowHour));
     if (idx < 0) idx = 0;
 
     const cur = {
       time: times[idx].slice(11, 16),
-      exactTime: now.toLocaleTimeString("pt-PT", { hour: '2-digit', minute: '2-digit' }),
+      exactTime,
       temp: Math.round(data.hourly.temperature_2m[idx]),
       code: data.hourly.weathercode[idx],
     };

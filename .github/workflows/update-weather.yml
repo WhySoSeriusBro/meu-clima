@@ -39,27 +39,28 @@ jobs:
       - name: Gerar API JSON
         run: |
           mkdir -p api
-          
-          # 1. API de Display
-          cat << 'EOF' > api/display
+          VERSION=$(date +%Y%m%d%H%M)
+
+          # 1. API de Display — URL versionado força o TRMNL a descarregar imagem nova
+          cat > api/display << EOF
           {
             "status": 0,
-            "image_url": "https://whysoseriusbro.github.io/meu-clima/image.bmp",
+            "image_url": "https://whysoseriusbro.github.io/meu-clima/image.bmp?v=${VERSION}",
             "filename": "image.bmp",
-            "refresh_rate": 3600,
+            "refresh_rate": 1800,
             "reset_firmware": false,
             "update_firmware": false,
             "firmware_url": null,
             "special_function": "sleep"
           }
           EOF
-          
+
           # 2. API de Registo (Setup) - MUITO IMPORTANTE para o primeiro arranque!
-          cat << 'EOF' > api/setup
+          cat > api/setup << EOF
           {
             "api_key": "12345678-1234-1234-1234-123456789012",
             "friendly_id": "MEU-CLIMA",
-            "image_url": "https://whysoseriusbro.github.io/meu-clima/image.bmp",
+            "image_url": "https://whysoseriusbro.github.io/meu-clima/image.bmp?v=${VERSION}",
             "message": "Welcome!"
           }
           EOF
