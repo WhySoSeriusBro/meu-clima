@@ -51,6 +51,7 @@ async function build() {
 
     const cur = {
       time: times[idx].slice(11, 16),
+      exactTime: now.toLocaleTimeString("pt-PT", { hour: '2-digit', minute: '2-digit' }),
       temp: Math.round(data.hourly.temperature_2m[idx]),
       code: data.hourly.weathercode[idx],
     };
@@ -91,7 +92,7 @@ async function build() {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
-    padding: 20px 40px;
+    padding: 10px 40px;
     border-bottom: 6px solid #000;
   }
   .topbar-title { font-size: 24px; font-weight: 900; letter-spacing: 6px; margin-right: 40px; }
@@ -99,15 +100,15 @@ async function build() {
   .main { display: flex; flex: 1; }
   .current {
     width: 380px; border-right: 6px solid #000; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; padding: 20px;
+    align-items: center; justify-content: center; padding: 10px;
   }
-  .current-time { font-size: 44px; font-weight: 900; margin-bottom: 15px; }
-  .current-temp { font-size: 120px; font-weight: 900; line-height: 0.8; margin: 15px 0; }
-  .current-temp sup { font-size: 50px; vertical-align: top; }
+  .current-time { font-size: 38px; font-weight: 900; margin-bottom: 5px; }
+  .current-temp { font-size: 100px; font-weight: 900; line-height: 0.8; margin: 5px 0; }
+  .current-temp sup { font-size: 40px; vertical-align: top; }
   .current-desc-box { border: 5px solid #000; padding: 8px 20px; margin-top: 10px; }
   .current-desc { font-size: 20px; font-weight: 900; text-transform: uppercase; }
   .hours { flex: 1; display: flex; flex-direction: column; }
-  .hour-card { flex: 1; display: flex; align-items: center; padding: 0 40px; gap: 30px; border-bottom: 4px solid #000; }
+  .hour-card { flex: 1; display: flex; align-items: center; padding: 0 30px; gap: 20px; border-bottom: 4px solid #000; }
   .hour-card:last-child { border-bottom: none; }
   .hour-time { font-size: 26px; font-weight: 900; width: 90px; }
   .hour-icon { width: 60px; display: flex; justify-content: center; }
@@ -125,7 +126,7 @@ async function build() {
 </div>
 <div class="main" id="main-content">
   <div class="current">
-    <div class="current-time">${cur.time}</div>
+    <div class="current-time">${cur.exactTime}</div>
     <div id="cur-icon"><div style="width:130px">${ICONS[curWMO.icon]}</div></div>
     <div class="current-temp">${cur.temp}<sup>°</sup></div>
     <div class="current-desc-box">
